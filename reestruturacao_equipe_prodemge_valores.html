@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Renovação Contratual - PMMG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --pmmg-blue: #003366;
+            --pmmg-gold: #c5a059;
+            --pmmg-dark: #001f3f;
+        }
+        .bg-pmmg-blue { background-color: var(--pmmg-blue); }
+        .text-pmmg-blue { color: var(--pmmg-blue); }
+        .bg-pmmg-gold { background-color: var(--pmmg-gold); }
+
+        .card-hover:hover { transform: translateY(-3px); }
+
+        .divider-label {
+            position: relative;
+            text-align: center;
+            margin: 2.5rem 0;
+        }
+        .divider-label::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pmmg-gold), transparent);
+        }
+        .divider-text {
+            position: relative;
+            background: #fff;
+            padding: 0 20px;
+            color: var(--pmmg-gold);
+            font-weight: 900;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .row-summary {
+            background-color: #f1f5f9;
+            border-top: 2px solid #cbd5e1;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        /* Animação para estouro de barra */
+        @keyframes break-limit {
+            0% { transform: scaleX(1); }
+            50% { transform: scaleX(1.05); }
+            100% { transform: scaleX(1); }
+        }
+        .animate-break { animation: break-limit 0.5s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen font-sans text-slate-800">
+
+    <header class="bg-pmmg-blue text-white py-12 shadow-2xl border-b-4 border-pmmg-gold">
+        <div class="container mx-auto px-8">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-black tracking-tighter uppercase leading-none">Análise de Expansão e Renovação</h1>
+                    <p class="text-blue-200 mt-2 font-medium tracking-wide">Gerência de Sistemas PMMG | Contrato INF.4969/00</p>
+                </div>
+                <div class="mt-6 md:mt-0 text-right">
+                    <span class="text-[10px] uppercase font-bold opacity-60 block">Status do Planeamento</span>
+                    <span class="bg-green-500 text-white px-4 py-1 rounded-full text-xs font-black animate-pulse">MARÇO/2026 - ATIVO</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-8 -mt-12">
+
+        <!-- Metrics Section -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-slate-300 card-hover transition-all">
+                <p class="text-[10px] text-slate-400 font-black uppercase">Teto Ciclo Atual</p>
+                <h3 class="text-xl font-black">R$ 4.809.600,00</h3>
+                <p class="text-[9px] text-slate-400 mt-1">Vigência até 31/Mai/2026</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-blue-600 card-hover transition-all">
+                <p class="text-[10px] text-slate-400 font-black uppercase">Valor Renovação (+IPCA)</p>
+                <h3 class="text-xl font-black text-pmmg-blue">R$ 4.992.845,76</h3>
+                <p class="text-[9px] text-slate-400 mt-1">Correção Monetária 3,81%</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-pmmg-gold card-hover transition-all">
+                <p class="text-[10px] text-slate-400 font-black uppercase">Teto Aditivo Legal (+25%)</p>
+                <h3 class="text-xl font-black text-amber-700">R$ 6.241.057,20</h3>
+                <p class="text-[9px] text-slate-400 mt-1">Capacidade Máxima Proposta</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-lg p-6 border-t-4 border-green-600 card-hover transition-all">
+                <p class="text-[10px] text-slate-400 font-black uppercase">Nova Hora Técnica</p>
+                <h3 class="text-xl font-black text-green-700">R$ 173,36</h3>
+                <p class="text-[9px] text-slate-400 mt-1">A partir de 01/Jun/2026</p>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="p-8 bg-slate-50 flex flex-col md:flex-row justify-between items-center gap-6 border-b">
+                <div class="text-center md:text-left">
+                    <h2 class="text-2xl font-black text-pmmg-blue uppercase leading-tight">Simulador de Efetivo Estratégico</h2>
+                    <p class="text-sm text-slate-500 mt-1">Explore os cenários de contratação e o impacto no saldo acumulado.</p>
+                </div>
+                <div class="inline-flex p-1.5 bg-slate-200 rounded-2xl shadow-inner">
+                    <button onclick="update('15')" id="btn15" class="px-5 py-2.5 rounded-xl font-black transition-all text-xs uppercase tracking-tighter">15 Colab.</button>
+                    <button onclick="update('20')" id="btn20" class="px-5 py-2.5 rounded-xl font-black transition-all text-xs uppercase tracking-tighter">20 Colab.</button>
+                    <button onclick="update('21')" id="btn21" class="px-5 py-2.5 rounded-xl font-black transition-all text-xs uppercase tracking-tighter">21 Colab.</button>
+                    <button onclick="update('21-delayed')" id="btn21-delayed" class="px-5 py-2.5 rounded-xl font-black transition-all text-xs uppercase tracking-tighter">21p (Estratégico)</button>
+                </div>
+            </div>
+
+            <div class="p-8 grid grid-cols-1 lg:grid-cols-4 gap-12">
+                <!-- Advanced Progress Visual -->
+                <div class="lg:col-span-1 space-y-10">
+                    <div class="bg-pmmg-blue text-white p-8 rounded-3xl text-center shadow-xl border-b-8 border-pmmg-gold relative">
+                        <span class="block text-6xl font-black mb-1 italic tracking-tighter" id="dispCount">15</span>
+                        <span class="text-[11px] uppercase font-black tracking-widest opacity-50">Equipa Técnica</span>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-end">
+                            <span class="text-[11px] font-black uppercase text-slate-500">Uso do Orçamento Ciclo 2</span>
+                            <span class="text-lg font-black transition-all duration-500" id="percText">0%</span>
+                        </div>
+                        <div class="relative w-full bg-slate-200 rounded-full h-8 overflow-visible">
+                            <!-- Base Bar -->
+                            <div id="progBar" class="absolute h-full bg-pmmg-blue rounded-full transition-all duration-1000 ease-out z-20 shadow-lg" style="width: 0%"></div>
+                            <!-- Overflow Bar -->
+                            <div id="progOver" class="absolute h-full bg-red-600 rounded-r-full transition-all duration-1000 ease-out z-10" style="left: 100%; width: 0%"></div>
+
+                            <!-- 100% Limit Marker -->
+                            <div class="absolute left-full top-0 h-12 w-1 bg-slate-400 -mt-2 z-30 flex items-center justify-center">
+                                <span class="absolute -top-6 text-[9px] font-black text-slate-400">TETO LEGAL</span>
+                            </div>
+                        </div>
+                        <div id="alertBox" class="text-[11px] font-black py-3 px-4 rounded-xl text-center shadow-sm uppercase tracking-wider"></div>
+                    </div>
+
+                    <div class="p-6 bg-slate-50 rounded-2xl border-2 border-slate-100">
+                        <h4 class="text-[11px] font-black text-pmmg-blue uppercase mb-4 border-b pb-2">Resumo da Renovação</h4>
+                        <div class="space-y-3">
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400 font-bold">Investimento Total:</span>
+                                <span class="font-black text-slate-700" id="totalVal">R$ 0</span>
+                            </div>
+                            <div class="flex justify-between text-xs">
+                                <span class="text-slate-400 font-bold">Volume de Horas:</span>
+                                <span class="font-black text-slate-700" id="totalHrs">0h</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expanded Data Table -->
+                <div class="lg:col-span-3 overflow-x-auto">
+                    <table class="w-full text-[11px] text-left">
+                        <thead>
+                            <tr class="text-slate-400 border-b-2 border-slate-100">
+                                <th class="pb-4 font-black uppercase">Período</th>
+                                <th class="pb-4 font-black uppercase">Mensalidade</th>
+                                <th class="pb-4 font-black uppercase">Acumulado (R$)</th>
+                                <th class="pb-4 font-black uppercase">Acumulado (Hrs)</th>
+                                <th class="pb-4 font-black uppercase">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mainTable" class="divide-y divide-slate-100">
+                            <!-- Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 py-10 border-t border-slate-200 flex flex-col md:flex-row justify-between items-center text-slate-400 gap-8">
+            <div class="text-xs font-bold uppercase tracking-widest opacity-60">
+                Análise baseada na produtividade real de 143,38h/mês per capita.
+            </div>
+            <div class="flex gap-4">
+                <button onclick="window.print()" class="bg-pmmg-blue text-white px-8 py-3 rounded-2xl font-black hover:bg-pmmg-dark transition-all flex items-center gap-3 shadow-xl">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2-2v4h10z"></path></svg>
+                    Imprimir Relatório
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        const RAW_DATA = [
+            { m: "Jun/25", v: 287240, h: 1720, hist: true }, { m: "Jul/25", v: 329992, h: 1976, hist: true },
+            { m: "Ago/25", v: 343352, h: 2056, hist: true }, { m: "Set/25", v: 399464, h: 2392, hist: true },
+            { m: "Out/25", v: 391448, h: 2344, hist: true }, { m: "Nov/25", v: 340680, h: 2040, hist: true },
+            { m: "Dez/25", v: 348696, h: 2088, hist: true }, { m: "Jan/26", v: 364728, h: 2184, hist: true },
+            { m: "Fev/26", v: 319304, h: 1912, hist: true }, { m: "Mar/26", v: 436872, h: 2616, hist: true },
+            { m: "Abr/26", v: 347360, h: 2080, hist: false }, { m: "Mai/26", v: 400800, h: 2400, hist: false }
+        ];
+
+        const PROJ_MONTHS = ["Jun/26", "Jul/26", "Ago/26", "Set/26", "Out/26", "Nov/26", "Dez/26", "Jan/27", "Fev/27", "Mar/27", "Abr/27", "Mai/27"];
+
+        const TETO_C1 = 4809600.00;
+        const HRS_C1 = 28800;
+        const TETO_C2 = 6241057.20;
+        const HRS_C2 = 36000;
+
+        const AVG_H_P_P = 143.38;
+        const RATE_26 = 173.36;
+
+        function update(scenario) {
+            let countVal = parseInt(scenario.replace('21-delayed', '21'));
+            let displayCount = scenario === '21-delayed' ? '21*' : countVal;
+
+            // UI
+            ['15', '20', '21', '21-delayed'].forEach(s => {
+                const b = document.getElementById('btn' + s);
+                b.className = s === scenario ? "px-5 py-2.5 rounded-xl font-black transition-all text-xs uppercase bg-white text-pmmg-blue shadow-lg border border-slate-300" : "px-5 py-2.5 rounded-xl font-black transition-all text-xs uppercase text-slate-500 hover:text-pmmg-blue";
+            });
+
+            document.getElementById('dispCount').innerText = displayCount;
+            const tbody = document.getElementById('mainTable');
+            tbody.innerHTML = '';
+
+            let accVal1 = 0;
+            let accHrs1 = 0;
+
+            // --- CICLO 1 ---
+            RAW_DATA.forEach(d => {
+                let v = (d.v / 15) * countVal;
+                let h = (d.h / 15) * countVal;
+                accVal1 += v;
+                accHrs1 += h;
+
+                tbody.innerHTML += `
+                    <tr class="${d.hist ? '' : 'bg-blue-50/20'}">
+                        <td class="py-3 font-black ${d.hist ? 'text-slate-400' : 'text-blue-500 italic'}">${d.m}</td>
+                        <td class="py-3 font-bold text-slate-700">${v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td class="py-3 text-slate-400 font-medium">${accVal1.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td class="py-3 text-slate-400 font-medium">${Math.round(accHrs1).toLocaleString()} h</td>
+                        <td class="py-3"><span class="${d.hist ? 'bg-slate-100 text-slate-500' : 'bg-blue-100 text-blue-600'} px-2 py-0.5 rounded-lg text-[8px] font-black uppercase">${d.hist ? 'HISTÓRICO' : 'PROJETADO'}</span></td>
+                    </tr>
+                `;
+            });
+
+            // Sobra C1
+            let sV1 = TETO_C1 - accVal1;
+            let sH1 = HRS_C1 - accHrs1;
+            tbody.innerHTML += `
+                <tr class="row-summary">
+                    <td class="py-4 font-black text-slate-900 uppercase tracking-tighter italic">Sobra de Contrato Ciclo 25/26</td>
+                    <td class="py-4 font-black ${sV1 < 0 ? 'text-red-600' : 'text-green-600'}">${sV1.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td class="py-4 text-slate-400 font-bold">---</td>
+                    <td class="py-4 font-black ${sH1 < 0 ? 'text-red-600' : 'text-green-600'}">${Math.round(sH1).toLocaleString()} h</td>
+                    <td class="py-4 text-slate-600 font-black">BALANÇO</td>
+                </tr>
+            `;
+
+            tbody.innerHTML += `<tr><td colspan="5"><div class="divider-label"><span class="divider-text">Novo Ciclo Contratual (+IPCA)</span></div></td></tr>`;
+
+            // --- CICLO 2 ---
+            let accVal2 = 0;
+            let accHrs2 = 0;
+            PROJ_MONTHS.forEach((m, idx) => {
+                let p = countVal;
+                if (scenario === '21-delayed') p = (idx < 2) ? 20 : 21;
+                else if (scenario === '21' && idx === 0) p = 20;
+
+                let h = AVG_H_P_P * p;
+                let v = h * RATE_26;
+                accVal2 += v;
+                accHrs2 += h;
+
+                tbody.innerHTML += `
+                    <tr class="bg-blue-50/30">
+                        <td class="py-3 font-black text-pmmg-blue">${m}</td>
+                        <td class="py-3 font-black text-pmmg-blue">${v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td class="py-3 font-bold text-slate-500 italic">${accVal2.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                        <td class="py-3 font-bold text-slate-500 italic">${Math.round(accHrs2).toLocaleString()} h</td>
+                        <td class="py-3"><span class="bg-pmmg-blue text-white px-2 py-0.5 rounded-lg text-[8px] font-black uppercase">REAJUSTADO (${p}p)</span></td>
+                    </tr>
+                `;
+            });
+
+            // Sobra C2
+            let sV2 = TETO_C2 - accVal2;
+            let sH2 = HRS_C2 - accHrs2;
+            tbody.innerHTML += `
+                <tr class="row-summary">
+                    <td class="py-4 font-black text-pmmg-blue uppercase tracking-tighter italic">Sobra de Contrato Ciclo 26/27</td>
+                    <td class="py-4 font-black ${sV2 < 0 ? 'text-red-600' : 'text-green-600'}">${sV2.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td class="py-4 text-slate-400 font-bold">---</td>
+                    <td class="py-4 font-black ${sH2 < 0 ? 'text-red-600' : 'text-green-600'}">${Math.round(sH2).toLocaleString()} h</td>
+                    <td class="py-4 text-slate-600 font-black">CONCLUÍDO</td>
+                </tr>
+            `;
+
+            // Percent Visuals
+            const perc = (accVal2 / TETO_C2) * 100;
+            const percTextEl = document.getElementById('percText');
+            percTextEl.innerText = Math.round(perc) + '%';
+
+            document.getElementById('totalVal').innerText = accVal2.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('totalHrs').innerText = Math.round(accHrs2).toLocaleString() + 'h';
+
+            const pb = document.getElementById('progBar');
+            const po = document.getElementById('progOver');
+            const ab = document.getElementById('alertBox');
+
+            if (perc > 100) {
+                pb.style.width = '100%';
+                po.style.width = (perc - 100) + '%';
+                po.style.opacity = '1';
+                po.classList.add('animate-break');
+                percTextEl.className = "text-xl font-black text-red-600";
+                ab.innerText = 'LIMITE LEGAL EXCEDIDO';
+                ab.className = "text-[11px] font-black py-3 px-4 rounded-xl text-center bg-red-100 text-red-700 animate-pulse";
+            } else {
+                pb.style.width = perc + '%';
+                po.style.opacity = '0';
+                po.style.width = '0%';
+                po.classList.remove('animate-break');
+                percTextEl.className = "text-xl font-black text-pmmg-blue";
+                ab.innerText = 'DENTRO DO TETO PREVISTO';
+                ab.className = "text-[11px] font-black py-3 px-4 rounded-xl text-center bg-green-100 text-green-700";
+            }
+        }
+
+        window.onload = () => update('15');
+    </script>
+</body>
+</html>
